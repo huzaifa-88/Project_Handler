@@ -16,11 +16,6 @@ import { BrowserRouter as Router, Route} from 'react-router-dom';
 //   );
 // }
 
-// import Home from './components/Home'; // Import your components for each route
-// import About from './components/About';
-// import Projects from './components/Projects';
-// import NotFound from './components/NotFound';
-
 const App = () => {
   return (
     <Router>

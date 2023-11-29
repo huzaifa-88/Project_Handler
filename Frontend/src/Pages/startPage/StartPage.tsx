@@ -2,8 +2,7 @@ import React from 'react';
 // import {Link} from 'react-router-dom';
 import TaskLogo from '../../Pages/Assets/trello-removebg.png';
 import { useState } from 'react';
-import { useHistory, BrowserRouter as Link } from 'react-router-dom';
-import Login from "../LoginPage/loginPage.tsx";
+import { useHistory } from 'react-router-dom';
 
 // import { withRouter } from "react-router-dom";
 // import NavLinks from "./Navlinks.tsx";

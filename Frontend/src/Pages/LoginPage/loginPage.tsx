@@ -3,8 +3,6 @@
 // import GOOGLE_IMAGE from 'D:/Images/Background Remove/gooogle-removeBG.png';
 import GOOGLE_IMAGE from '../Assets/google-removeBG.png';
 import React from 'react';
-import RegisterUser from './registerPage.tsx';
-import start from '../startPage/StartPage.tsx';
 import { useState, useEffect, } from 'react';
 import { useHistory} from 'react-router-dom';
 import axios from 'axios';
@@ -18,6 +16,7 @@ const Login: React.FC = () => {
     const [rememberMe, setRememberMe] = useState(false);
     const history = useHistory();
     const [isLoading, setIsLoading] = useState(false);
+    const [message, setMessage] = useState('Waiting for the message...');
 
     const handleDontAccountButton = () => {
         // Set loading state to true when the button is clicked
@@ -32,6 +31,17 @@ const Login: React.FC = () => {
     };
 
     useEffect(() => {
+
+
+        axios.get('http://127.0.0.1:5000/api/data') // Replace with your API endpoint
+        .then(response => {
+            setMessage(response.data);
+        })
+        .catch(error => {
+            console.log('Error:', error);
+            setMessage('Failed to fetch data');
+        });
+
         const rememberedUsername = localStorage.getItem('rememberedUsername');
         if (rememberedUsername) {
           setUsername(rememberedUsername);
@@ -41,19 +51,38 @@ const Login: React.FC = () => {
 
 
     const handleLogin = async () => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regular expression for email validation
+
+        // Check if the email matches the pattern
+        const isEmailValid = emailRegex.test(username);
+
+        if (!isEmailValid) {
+            // Invalid email format, show an error message or take appropriate action
+            console.log('Invalid email format');
+            setLoginMessage('Invalid email format');
+            return; // Stop further execution
+        }
         try {
-            const response = await axios.post('http://localhost:5000/api/login', {
-            username,
-            password,
-          });
+            const userLogin = {
+                UserEmail: username,
+                Password: password
+            }
+            const response = await axios({
+                method: "post",
+                url: 'http://localhost:5000/api/login',
+                headers: {'Content-Type': 'application/json'},
+                data: userLogin
+            });
           
           // Handle successful login response, e.g., store token in local storage or state
           console.log('Login successful!', response.data);
           if(response.status === 200){
-            alert("Successfully Logged In");
-            window.location.href="/";
+            setLoginMessage("Successfully Logged In");
+            console.log(response.data.token);
+            localStorage.setItem('token', response.data.token);
+            window.location.href="/Home";
             }else{
-                alert("Invalid Username and Password")
+                setLoginMessage("Invalid Username and Password")
             }
             setLoginMessage('Login successful!');
             if (rememberMe) {
@@ -62,7 +91,9 @@ const Login: React.FC = () => {
         } catch (error) {
           console.error('Login failed:', error.response?.data);
           // Handle login failure, show error message, etc.
-          setLoginMessage('Login failed. Please try again.');
+          setLoginMessage('Login failed. Please try again');
+          console.log(username);
+          console.log(password);
         }
         setUsername('');
         setPassword('');
@@ -142,6 +173,10 @@ const Login: React.FC = () => {
                         <span className='font-semibold underline underline-offset-2 cursor-pointer hover:text-blue-900'>Don't have an account? Sign up</span>
                     </button>
                 </div>
+                <div>
+        <h1>Hello from React</h1>
+        <p>{message}</p>
+      </div>
 
             </div>
         </div>

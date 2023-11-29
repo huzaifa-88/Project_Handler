@@ -1,10 +1,8 @@
 //@ts-ignore
 
-
-import COVER_IMAGE from '../Assets/cafe-club.jpg';
 import React from 'react';
 import Google_Icon from '../Assets/google-removeBG.png';
-import { useState, useEffect, } from 'react';
+import { useState, useEffect } from 'react';
 import { useHistory} from 'react-router-dom';
 import axios from 'axios';
 
@@ -16,6 +14,7 @@ const RegisterUser: React.FC = () => {
     const [RegisterMessage, setRegisterMessage] = useState('');
     const history = useHistory();
     const [isLoading, setIsLoading] = useState(false);
+
 
     const handleButton = () => {
         // Set loading state to true when the button is clicked
@@ -30,6 +29,35 @@ const RegisterUser: React.FC = () => {
     };
 
     const handleRegister = async () => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regular expression for email validation
+        // const passwordRegex = /^(?=.*[A-Z])(?=.*[\W_]).{5,}$/; // Regular expression for password validation
+
+        // Check if the email matches the pattern
+        const isEmailValid = emailRegex.test(email);
+
+        // Check if the password matches the pattern
+        // const isPasswordValid = passwordRegex.test(password);
+
+        if (!isEmailValid) {
+            // Invalid email format, show an error message or take appropriate action
+            console.log('Invalid email format');
+            setRegisterMessage('Invalid email format');
+            setTimeout(() => {
+                setRegisterMessage('');
+            }, 3000); // Clear the message after 3 seconds
+            return; // Stop further execution
+        }
+
+        // if (!isPasswordValid) {
+        //     // Invalid password format, show an error message or take appropriate action
+        //     console.log('Invalid password format');
+        //     setRegisterMessage('Password must be minimum 5 characters with 1 capital letter and 1 special character');
+        //     setTimeout(() => {
+        //         setRegisterMessage('');
+        //     }, 3000); // Clear the message after 3 seconds
+        //     return; // Stop further execution
+        // }
+
         try {
             const userregister = {
                 FullName: fullName,
@@ -37,25 +65,25 @@ const RegisterUser: React.FC = () => {
                 Role :role,
                 Password: password
             }
-            console.log(userregister)
+            // console.log(userregister)
             const response = await axios.post('http://localhost:5000/api/users', userregister);
           
           // Handle successful login response, e.g., store token in local storage or state
           console.log('Registration successful!', response.data);
-          if(response.status === 201){
+          if(response.data === "Email Already Exists"){
+            alert("Email Already Exists");
+        }else{
             alert("Registration Successfully");
-            window.location.href="/";
-            }else{
-                alert("Email already exist")
-            }
+            window.location.href="/login";
+        }
         } catch (error) {
           console.log('Registration failed:', error);
           // Handle Registration failure, show error message, etc.
-          setRegisterMessage('Registration failed. Please try again.'+error);
+          setRegisterMessage('Registration failed. Please try again');
         }
         setFullName('');
-        setEmail(' ');
-        setRole(' ');
+        setEmail('');
+        setRole('');
         setPassword('');
         setTimeout(() => {
             setRegisterMessage('');
@@ -102,7 +130,7 @@ const RegisterUser: React.FC = () => {
                         {/* <button><img src={Google_Icon}/></button> */}
                         <input 
                             type = 'text'
-                            placeholder='Role' 
+                            placeholder='Role'
                             className='w-full text-black py-2 my-2 bg-transparent border-b border-black outline-none focus:outline-none' 
                             value={role}
                             onChange={(e) => setRole(e.target.value)}    
